@@ -4,6 +4,10 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/sem.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 
 #define sleepEM(time){ if (time != 0) usleep(rand() % time);}
@@ -24,6 +28,8 @@ int *NB = NULL;
 int *action_counter = NULL;
 //int *IMM_counter = NULL;
 
+sem_t *semafor = NULL;
+
 //IMM prints
 void print_imm_starts(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: starts\n",                                 *action_counter, imm_id); }
 void print_imm_enters(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             *action_counter, imm_id, *NE, *NC, *NB); }
@@ -38,21 +44,26 @@ void print_judge_starts() { fprintf(stdout, "%i\t: JUDGE\t\t\t: starts confirmat
 void print_judge_ends()   { fprintf(stdout, "%i\t: JUDGE\t\t\t: ends confirmation\t: %i\t: %i\t: %i\n",     *action_counter, *NE, *NC, *NB); }
 void print_judge_leaves() { fprintf(stdout, "%i\t: JUDGE\t\t\t: leaves\t\t: %i\t: %i\t: %i\n",              *action_counter, *NE, *NC, *NB); }
 
-/*void IMM_generator(int PI, int IG){
 
-    for (int i =0; i < PI; i++){
+void IMM_generator(){
+
+    for (int i =0; i < *PI; i++){
 
         pid_t IMM = fork();
         if (IMM == 0){
             //immmigrant
-            sleepEM(PI);
+            sleepEM(*PI);
         }
+        sleepEM(*PI);
     }
-}*/
+}
 
 
 int main(int argc, char *argv[]){
     
+    //kolotocarina af opravit TODO
+    sem_unlink("/xjacko05.2020.semafor");
+
 	//argument count check
     if (argc != 6){fprintf(stderr, "Invalind arguments\n"); return 1;}
 
@@ -71,6 +82,8 @@ int main(int argc, char *argv[]){
 
     MMAP(action_counter);
     *action_counter = 0;
+
+    semafor = sem_open("/xjacko05.2020.semafor", O_CREAT | O_EXCL, 0666, 1);
 
 	//PI check
     *PI = atoi(argv[1]);
@@ -95,7 +108,7 @@ int main(int argc, char *argv[]){
     *JT = atoi(argv[5]);
     if (*JT == 0 && strcmp(argv[5], "0") != 0){fprintf(stderr, "Invalind arguments\n"); return 1;}
     if (*JT < 0 || *JT > 2000) return 1;
-/*
+
     ///ACTUAL CODE
     pid_t proc_JUDGE = fork();
     if(proc_JUDGE == 0){
@@ -103,9 +116,9 @@ int main(int argc, char *argv[]){
     }
     pid_t proc_IMM_gen = fork();
     if(proc_IMM_gen == 0){
-        IMM_generator(PI, IG);
+        IMM_generator();
     }
-*/
+
 
 	
     return 0;
