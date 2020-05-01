@@ -30,6 +30,7 @@ int *action_counter = NULL;
 int *IMM_counter = NULL;
 int* proc_done = NULL;
 bool *judge_inside = NULL;
+int *solved_counter = NULL;
 
 sem_t *imm_enters = NULL;
 sem_t *imm_checks = NULL;
@@ -64,6 +65,8 @@ int variable_map(){
     *proc_done = -2;
     MMAP(judge_inside)
     *judge_inside = false;
+    MMAP(solved_counter);
+    * solved_counter = 0;
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((imm_checks = sem_open("/xjacko05.2020.imm_checks", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
@@ -161,6 +164,7 @@ fprintf(stderr, "IMM_GEN_START\n");
             //wants & got
             sem_wait(decided);
             print_imm_wants(id);
+            sem_post(decided);
             sleepEM(*IT);
             print_imm_got(id);
 
@@ -180,7 +184,10 @@ fprintf(stderr, "IMM_GEN_END\n");
 
 
 int main(int argc, char *argv[]){
+
+    //KOLOTOCARINA AF opravit TODO
     cleanup();
+
 	//argument count check
     if (argc != 6){fprintf(stderr, "Invalind arguments\n"); return 1;}
 
@@ -215,16 +222,30 @@ int main(int argc, char *argv[]){
     pid_t proc_JUDGE = fork();
     if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE_RIP\n"); return 1;}
     if(proc_JUDGE == 0){
+
         printf("JUDGE\n");
-        sleepEM(*JG);
-        print_judge_wants();
-        sem_trywait(judge_wants);
-        sem_trywait(judge_in);
-        *judge_inside = true;
-        print_judge_enters();
-        sem_wait(judge_waits);
-        print_judge_starts();
-        sleepEM(*JT);
+        while(*solved_counter != *PI){
+
+
+            sleepEM(*JG);
+            print_judge_wants();
+            sem_trywait(judge_wants);
+            sem_trywait(judge_in);
+            *judge_inside = true;
+            print_judge_enters();
+            sem_wait(judge_waits);
+            print_judge_starts();
+            sleepEM(*JT);
+            solved_counter += NC;
+            *NE = 0;
+            *NC = 0;
+            print_judge_ends();
+            sleepEM(*JT);
+            print_judge_leaves();
+            *judge_inside = false
+            sem_post(judge_wants);
+        }
+
         //sem_trywait(imm_enters);
         if (++*proc_done == *PI) sem_post(alldone);
         exit(0);
