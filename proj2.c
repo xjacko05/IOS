@@ -12,8 +12,8 @@
 
 
 #define sleepEM(time){ if (time != 0) usleep((rand() % time) * 1000);}
-#define MMAP(ptr) {(ptr) = mmap(NULL, sizeof(*(ptr)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);}
-#define UNMAP(ptr) {munmap((ptr), sizeof((ptr)));}
+//#define MMAP(ptr) {(ptr) = mmap(NULL, sizeof(*(ptr)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);}
+//#define UNMAP(ptr) {munmap((ptr), sizeof((ptr)));}
 
 
 int *PI = NULL;
@@ -39,7 +39,6 @@ int *to_leave = NULL;
 sem_t *imm_enters = NULL;
 sem_t *imm_checks = NULL;
 sem_t *judge_in = NULL;
-sem_t *judge_wants = NULL;
 sem_t *judge_waits = NULL;
 sem_t *decided = NULL;
 sem_t *alldone = NULL;
@@ -52,36 +51,35 @@ int variable_map(){
     IT = mmap(NULL, sizeof(*(IT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IT)
     JT = mmap(NULL, sizeof(*(JT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(JT)
 
-    MMAP(NE)
+    NE = mmap(NULL, sizeof(*(NE)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NE)
     *NE = 0;
-    MMAP(NC)
+    NC = mmap(NULL, sizeof(*(NC)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NC)
     *NC = 0;
-    MMAP(NB)
+    NB = mmap(NULL, sizeof(*(NB)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NB)
     *NB = 0;
 
-    MMAP(action_counter)
+     action_counter= mmap(NULL, sizeof(*(action_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(action_counter)
     *action_counter = 0;
-    MMAP(IMM_counter)
+    IMM_counter = mmap(NULL, sizeof(*(IMM_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IMM_counter)
     *IMM_counter = 0;
-    MMAP(proc_done)
+    proc_done = mmap(NULL, sizeof(*(proc_done)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(proc_done)
     *proc_done = -2;
-    MMAP(judge_inside)
+    judge_inside = mmap(NULL, sizeof(*(judge_inside)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(judge_inside)
     *judge_inside = false;
-    MMAP(solved_counter)
+    solved_counter = mmap(NULL, sizeof(*(solved_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(solved_counter)
     *solved_counter = 0;
-    MMAP(collected_counter)
+    collected_counter = mmap(NULL, sizeof(*(collected_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(collected_counter)
     *collected_counter = 0;
-    MMAP(to_collect)
+    to_collect = mmap(NULL, sizeof(*(to_collect)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_collect)
     *to_collect = 0;
-    MMAP(left_counter)
+    left_counter = mmap(NULL, sizeof(*(left_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(left_counter)
     *left_counter = 0;
-    MMAP(to_leave)
+    to_leave = mmap(NULL, sizeof(*(to_leave)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_leave)
     *to_leave = 0;
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((imm_checks = sem_open("/xjacko05.2020.imm_checks", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((judge_in = sem_open("/xjacko05.2020.judge_in", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
-    if ((judge_wants = sem_open("/xjacko05.2020.judge_wants", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((judge_waits = sem_open("/xjacko05.2020.judge_waits", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((decided = sem_open("/xjacko05.2020.decided", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((alldone = sem_open("/xjacko05.2020.alldone", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
@@ -92,29 +90,28 @@ int variable_map(){
 
 void cleanup(){
 
-    UNMAP(PI)
-    UNMAP(IG)
-    UNMAP(JG)
-    UNMAP(IT)
-    UNMAP(JT)
+    munmap((PI), sizeof((PI)));//UNMAP(PI)
+    munmap((IG), sizeof((IG)));//UNMAP(IG)
+    munmap((JG), sizeof((JG)));//UNMAP(JG)
+    munmap((IT), sizeof((IT)));//UNMAP(IT)
+    munmap((JT), sizeof((JT)));//UNMAP(JT)
 
-    UNMAP(NE)
-    UNMAP(NC)
-    UNMAP(NB)
+    munmap((NE), sizeof((NE)));//UNMAP(NE)
+    munmap((NC), sizeof((NC)));//UNMAP(NC)
+    munmap((NB), sizeof((NB)));//UNMAP(NB)
 
-    UNMAP(action_counter)
-    UNMAP(IMM_counter)
-    UNMAP(proc_done)
-    UNMAP(judge_inside)
-    UNMAP(solved_counter)
-    UNMAP(collected_counter)
-    UNMAP(to_collect)
-    UNMAP(left_counter)
-    UNMAP(to_leave)
+    munmap((action_counter), sizeof((action_counter)));//UNMAP(action_counter)
+    munmap((IMM_counter), sizeof((IMM_counter)));//UNMAP(IMM_counter)
+    munmap((proc_done), sizeof((proc_done)));//UNMAP(proc_done)
+    munmap((judge_inside), sizeof((judge_inside)));//UNMAP(judge_inside)
+    munmap((solved_counter), sizeof((solved_counter)));//UNMAP(solved_counter)
+    munmap((collected_counter), sizeof((collected_counter)));//UNMAP(collected_counter)
+    munmap((to_collect), sizeof((to_collect)));//UNMAP(to_collect)
+    munmap((left_counter), sizeof((left_counter)));//UNMAP(left_counter)
+    munmap((to_leave), sizeof((to_leave)));//UNMAP(to_leave)
 
     sem_close(imm_enters);
     sem_close(imm_checks);
-    sem_close(judge_wants);
     sem_close(judge_in);
     sem_close(judge_waits);
     sem_close(alldone);
@@ -122,7 +119,6 @@ void cleanup(){
 
     sem_unlink("xjacko05.2020.imm_enters");
     sem_unlink("xjacko05.2020.imm_checks");
-    sem_unlink("xjacko05.2020.judge_wants");
     sem_unlink("xjacko05.2020.judge_in");
     sem_unlink("xjacko05.2020.judge_waits");
     sem_unlink("xjacko05.2020.alldone");
