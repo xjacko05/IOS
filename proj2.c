@@ -82,7 +82,7 @@ int variable_map(){
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((imm_checks = sem_open("/xjacko05.2020.imm_checks", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
-    if ((judge_in = sem_open("/xjacko05.2020.judge_in", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
+    if ((judge_in = sem_open("/xjacko05.2020.judge_in", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((judge_wants = sem_open("/xjacko05.2020.judge_wants", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((judge_waits = sem_open("/xjacko05.2020.judge_waits", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((decided = sem_open("/xjacko05.2020.decided", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
