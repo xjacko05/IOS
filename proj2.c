@@ -33,6 +33,8 @@ bool *judge_inside = NULL;
 int *solved_counter = NULL;
 int *collected_counter = NULL;
 int *to_collect = NULL;
+int *left_counter = NULL;
+int *to_leave = NULL;
 
 sem_t *imm_enters = NULL;
 sem_t *imm_checks = NULL;
@@ -73,6 +75,10 @@ int variable_map(){
     *collected_counter = 0;
     MMAP(to_collect)
     *to_collect = 0;
+    MMAP(left_counter)
+    *left_counter = 0;
+    MMAP(to_leave)
+    *to_leave = 0;
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((imm_checks = sem_open("/xjacko05.2020.imm_checks", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
@@ -105,6 +111,8 @@ void cleanup(){
     UNMAP(solved_counter)
     UNMAP(collected_counter)
     UNMAP(to_collect)
+    UNMAP(left_counter)
+    UNMAP(to_leave)
 
     sem_close(imm_enters);
     sem_close(imm_checks);
@@ -139,7 +147,7 @@ void print_judge_waits()    { fprintf(stdout, "%i\t: JUDGE\t\t: waits fo imm\t: 
 void print_judge_starts()   { fprintf(stdout, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
 void print_judge_ends()     { fprintf(stdout, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
 void print_judge_leaves()   { fprintf(stdout, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes",                                ++*action_counter); }
+void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
 
 
 void IMM_generator(){
@@ -176,7 +184,10 @@ fprintf(stderr, "IMM_GEN_START\n");
             //wants & got
             sem_wait(decided);
             print_imm_wants(id);
-            if (*collected_counter++ != *to_collect) sem_post(decided);
+            ++*collected_counter;
+            if (*collected_counter != *to_collect){
+                sem_post(decided);
+            }
             else{
                 *collected_counter = 0;
                 *to_collect = 0;
@@ -188,7 +199,16 @@ fprintf(stderr, "IMM_GEN_START\n");
             sem_wait(judge_in);
             --*NB;
             print_imm_leaves(id);
-            sem_post(judge_in);
+            ++*left_counter;
+            if (*left_counter != *to_leave){
+                sem_post(judge_in);
+            }
+            else{
+                *left_counter = 0;
+                *to_leave = 0;
+            }
+
+            //sem_post(judge_in);////DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 
             //IMM termination
             if (++*proc_done == *PI) sem_post(alldone);
@@ -257,6 +277,7 @@ int main(int argc, char *argv[]){
             sem_wait(imm_checks);
             if (*NE != *NC){
                 print_judge_waits();
+                sem_post(imm_checks);
                 sem_wait(judge_waits);
             }
             sem_post(imm_checks);
@@ -266,6 +287,7 @@ int main(int argc, char *argv[]){
             sleepEM(*JT);
             *solved_counter += *NC;
             *to_collect = *NC;
+            *to_leave = *NC;
             *NE = 0;
             *NC = 0;
             print_judge_ends();
@@ -275,10 +297,11 @@ int main(int argc, char *argv[]){
             sleepEM(*JT);
             print_judge_leaves();
             *judge_inside = false;
-            sem_post(judge_in);
+            if (*to_leave != 0) sem_post(judge_in);
             sem_post(imm_enters);
         }
 
+        print_judge_finishes();
         //sem_trywait(imm_enters);
         if (++*proc_done == *PI) sem_post(alldone);
         exit(0);
