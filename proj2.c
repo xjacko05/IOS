@@ -46,13 +46,11 @@ sem_t *alldone = NULL;
 
 int variable_map(){
 
-    //PI = malloc(sizeof(int));
-    //*PI = 0;
-    MMAP(PI)
-    MMAP(IG)
-    MMAP(JG)
-    MMAP(IT)
-    MMAP(JT)
+    PI = mmap(NULL, sizeof(*(PI)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(PI)
+    IG = mmap(NULL, sizeof(*(IG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IG)
+    JG = mmap(NULL, sizeof(*(JG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(JG)
+    IT = mmap(NULL, sizeof(*(IT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IT)
+    JT = mmap(NULL, sizeof(*(JT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(JT)
 
     MMAP(NE)
     *NE = 0;
@@ -151,7 +149,6 @@ void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",    
 
 
 void IMM_generator(){
-fprintf(stderr, "IMM_GEN_START\n");
 
     for (int i = 0; i < *PI; i++){
 
@@ -159,20 +156,17 @@ fprintf(stderr, "IMM_GEN_START\n");
         if (IMM < 0) {fprintf(stderr, "IMMIGRANT_RIP\n"); exit(1);}
         if (IMM == 0){
             //immmigrant
-            //++*IMM_counter;
             int id = ++*IMM_counter;
 
             //starts
             print_imm_starts(id);
 
             //enters
-            //sem_wait(judge_in);
-            sem_wait(imm_enters);printf("ME\n");
+            sem_wait(imm_enters);
             ++*NE;
             ++*NB;
             print_imm_enters(id);
             sem_post(imm_enters);
-            //sem_post(judge_wants);
 
             //checks
             sem_wait(imm_checks);
@@ -208,15 +202,12 @@ fprintf(stderr, "IMM_GEN_START\n");
                 *to_leave = 0;
             }
 
-            //sem_post(judge_in);////DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-
             //IMM termination
             if (++*proc_done == *PI) sem_post(alldone);
             exit(0);
         }
         sleepEM(*IG);
     }
-fprintf(stderr, "IMM_GEN_END\n");
 }
 
 
@@ -260,17 +251,14 @@ int main(int argc, char *argv[]){
     if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE_RIP\n"); return 1;}
     if(proc_JUDGE == 0){
 
-        printf("JUDGE\n");
+        //printf("JUDGE\n");
         while(*solved_counter != *PI){
 
             //wants &enters
             sleepEM(*JG);
             print_judge_wants();
-            //sem_trywait(judge_wants);
-            sem_wait(imm_enters);printf("JUDG\n");
-            //sem_wait(judge_in);
+            sem_wait(imm_enters);
             *judge_inside = true;
-            //sem_trywait(judge_in);
             print_judge_enters();
 
             //waits
@@ -302,7 +290,6 @@ int main(int argc, char *argv[]){
         }
 
         print_judge_finishes();
-        //sem_trywait(imm_enters);
         if (++*proc_done == *PI) sem_post(alldone);
         exit(0);
     }
@@ -314,17 +301,8 @@ int main(int argc, char *argv[]){
         exit(0);
     }
     
- /*   while (*solved_counter != *PI){
-        sem_wait(judge_wants);
-        //if (judge_inside == false) sem_post(judge_wants);
-        sem_post(judge_in);
-    }
-*/
-
     sem_wait(alldone);
-
     cleanup();
 
-	printf("end\n");
     return 0;
 }
