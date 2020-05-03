@@ -133,20 +133,20 @@ void cleanup(){
 
 
 //IMM prints
-void print_imm_starts(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
-void print_imm_enters(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_checks(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_wants(int imm_id)    { fprintf(stdout, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_got(int imm_id)      { fprintf(stdout, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_leaves(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_starts(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
+void print_imm_enters(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_checks(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_wants(int imm_id)    { fprintf(filep, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_got(int imm_id)      { fprintf(filep, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_leaves(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
 //JUDGE prints
-void print_judge_wants()    { fprintf(stdout, "%i\t: JUDGE\t\t: wants to enter\t: %i\t: %i\t: %i\n",      ++*action_counter, *NE, *NC, *NB); }
-void print_judge_enters()   { fprintf(stdout, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_waits()    { fprintf(stdout, "%i\t: JUDGE\t\t: waits fo imm\t: %i\t: %i\t: %i\n",        ++*action_counter, *NE, *NC, *NB); }
-void print_judge_starts()   { fprintf(stdout, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
-void print_judge_ends()     { fprintf(stdout, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
-void print_judge_leaves()   { fprintf(stdout, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
+void print_judge_wants()    { fprintf(filep, "%i\t: JUDGE\t\t: wants to enter\t: %i\t: %i\t: %i\n",      ++*action_counter, *NE, *NC, *NB); }
+void print_judge_enters()   { fprintf(filep, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
+void print_judge_waits()    { fprintf(filep, "%i\t: JUDGE\t\t: waits fo imm\t: %i\t: %i\t: %i\n",        ++*action_counter, *NE, *NC, *NB); }
+void print_judge_starts()   { fprintf(filep, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
+void print_judge_ends()     { fprintf(filep, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
+void print_judge_leaves()   { fprintf(filep, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
+void print_judge_finishes() { fprintf(filep, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
 
 
 void IMM_generator(){
