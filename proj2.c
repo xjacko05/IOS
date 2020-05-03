@@ -259,7 +259,7 @@ int main(int argc, char *argv[]){
     if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE process fork error\n"); *forkfailed = true; sem_post(alldone); return 1;}
     if(proc_JUDGE == 0){
 
-        while(*solved_counter != *PI && forkfailed == false){
+        while(*solved_counter != *PI && *forkfailed == false){
 
             //wants & enters
             sleepEM(*JG);
