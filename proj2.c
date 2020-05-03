@@ -99,6 +99,7 @@ int variable_map(){
 
 void cleanup(){
 
+    fclose(filep);
     munmap((PI), sizeof((PI)));//UNMAP(PI)
     munmap((IG), sizeof((IG)));//UNMAP(IG)
     munmap((JG), sizeof((JG)));//UNMAP(JG)
@@ -141,20 +142,20 @@ void cleanup(){
 
 
 //IMM prints
-void print_imm_starts(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
-void print_imm_enters(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, ++*NE, *NC, ++*NB); }
-void print_imm_checks(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, ++*NC, *NB); }
-void print_imm_wants(int imm_id)    { fprintf(filep, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_got(int imm_id)      { fprintf(filep, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_leaves(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, --*NB); }
+void print_imm_starts(int imm_id)   { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); sem_post(outsync); }
+void print_imm_enters(int imm_id)   { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, ++*NE, *NC, ++*NB); sem_post(outsync); }
+void print_imm_checks(int imm_id)   { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, ++*NC, *NB); sem_post(outsync); }
+void print_imm_wants(int imm_id)    { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); sem_post(outsync); }
+void print_imm_got(int imm_id)      { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); sem_post(outsync); }
+void print_imm_leaves(int imm_id)   { sem_wait(outsync); fprintf(filep, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, --*NB); sem_post(outsync); }
 //JUDGE prints
-void print_judge_wants()    { fprintf(filep, "%i\t: JUDGE\t\t: wants to enter\n",                        ++*action_counter); }
-void print_judge_enters()   { fprintf(filep, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_waits()    { fprintf(filep, "%i\t: JUDGE\t\t: waits for imm\t\t: %i\t: %i\t: %i\n",     ++*action_counter, *NE, *NC, *NB); }
-void print_judge_starts()   { fprintf(filep, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
-void print_judge_ends()     { fprintf(filep, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
-void print_judge_leaves()   { fprintf(filep, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_finishes() { fprintf(filep, "%i\t: JUDGE\t\t: finishes\n",                              ++*action_counter); }
+void print_judge_wants()    { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: wants to enter\n",                        ++*action_counter); sem_post(outsync); }
+void print_judge_enters()   { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
+void print_judge_waits()    { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: waits for imm\t\t: %i\t: %i\t: %i\n",     ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
+void print_judge_starts()   { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
+void print_judge_ends()     { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
+void print_judge_leaves()   { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
+void print_judge_finishes() { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: finishes\n",                              ++*action_counter); sem_post(outsync); }
 
 
 void IMM_generator(){
@@ -168,25 +169,25 @@ void IMM_generator(){
             int id = ++*IMM_counter;
 
             //starts
-            sem_wait(outsync);print_imm_starts(id);sem_post(outsync);
+            print_imm_starts(id);
 
             //enters
             sem_wait(imm_enters);//printf("I2\n");
             //++*NE;//printf("I3\n");
             //++*NB;//printf("I4\n");
-            sem_wait(outsync);print_imm_enters(id);sem_post(outsync);//printf("I5\n");
+            print_imm_enters(id);//printf("I5\n");
             sem_post(imm_enters);//printf("I6\n");
 
             //checks
             sem_wait(imm_checks);//printf("I7\n");
             //++*NC;//printf("I8\n");
-            sem_wait(outsync);print_imm_checks(id);sem_post(outsync);
+            print_imm_checks(id);
             //if (*judge_inside == true && *NE == *NC) {sem_post(judge_waits);printf("I9\n");}
             sem_post(imm_checks);//printf("I10\n");
 
             //wants & got
             sem_wait(decided);
-            print_imm_wants(id);sem_post(outsync);
+            print_imm_wants(id);
             ++*collected_counter;
             if (*collected_counter != *to_collect){
                 sem_post(decided);
@@ -196,12 +197,12 @@ void IMM_generator(){
                 *to_collect = 0;
             }
  */         sleepEM(*IT);
-            sem_wait(outsync);print_imm_got(id);sem_post(outsync);
+            print_imm_got(id);
 
             //leaves
             sem_wait(judge_in);
             //--*NB;
-            sem_wait(outsync);print_imm_leaves(id);sem_post(outsync);
+            print_imm_leaves(id);
             ++*left_counter;
 /*            if (*left_counter != *to_leave){
                 sem_post(judge_in);
@@ -275,18 +276,18 @@ int main(int argc, char *argv[]){
 
             //wants & enters
             sleepEM(*JG);
-            sem_wait(outsync);print_judge_wants();sem_post(outsync);
+            print_judge_wants();
             sem_wait(imm_checks);//printf("J5\n");
             sem_wait(imm_enters);//printf("J1\n");//closes entrance
             sem_wait(judge_in);//printf("J2\n");//closes exit
             *judge_inside = true;//printf("J3\n");
-            sem_wait(outsync);print_judge_enters();sem_post(outsync);//printf("J4\n");
+            print_judge_enters();//printf("J4\n");
 
             //waits
             //sem_wait(imm_checks);printf("J5\n");
             //sem_wait(imm_checks);
             if (*NE != *NC){//printf("J6\n");
-                sem_wait(outsync);print_judge_waits();sem_post(outsync);//printf("J7\n");
+                print_judge_waits();//printf("J7\n");
                 //sem_post(imm_checks);printf("J8\n");
                 //sem_wait(judge_waits);printf("J9\n");
             }//printf("J10\n");
@@ -295,19 +296,19 @@ int main(int argc, char *argv[]){
             sem_wait(imm_checks);
 
             //confirms
-            sem_wait(outsync);print_judge_starts();sem_post(outsync);
+            print_judge_starts();
             sleepEM(*JT);
             *solved_counter += *NC;
             *to_collect += *NC;
             //*to_leave = *NC;
             *NE = 0;
             *NC = 0;
-            sem_wait(outsync);print_judge_ends();sem_post(outsync);
+            print_judge_ends();
             if (*to_collect != 0) sem_post(decided);
 
             //leaves
             sleepEM(*JT);
-            sem_wait(outsync);print_judge_leaves();sem_post(outsync);
+            print_judge_leaves();
             *judge_inside = false;
             //if (*to_leave != 0) sem_post(judge_in);//opens exit
             sem_post(imm_checks);
@@ -315,14 +316,13 @@ int main(int argc, char *argv[]){
             sem_post(judge_in);
         }
 
-        sem_wait(outsync);print_judge_finishes();sem_post(outsync);
+        print_judge_finishes();
         if (++*proc_done == *PI) sem_post(alldone);
         exit(0);
     }
 
     
     sem_wait(alldone);
-    fclose(filep);
     cleanup();
 
     return 0;
