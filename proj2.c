@@ -35,6 +35,7 @@ int *collected_counter = NULL;
 int *to_collect = NULL;
 int *left_counter = NULL;
 int *to_leave = NULL;
+bool *forkfailed = NULL;
 FILE *filep = NULL;
 
 sem_t *imm_enters = NULL;
@@ -77,6 +78,8 @@ int variable_map(){
     *left_counter = 0;
     to_leave = mmap(NULL, sizeof(*(to_leave)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_leave)
     *to_leave = 0;
+    forkfailed = mmap(NULL, sizeof(*(forkfailed)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    *forkfailed = false;
     filep = mmap(NULL, sizeof(*(filep)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(filep)
     filep = fopen("proj2.out", "w");//open("proj2.out", O_WRONLY | O_APPEND | O_CREAT, 0644);
     setbuf(filep, NULL);
@@ -113,6 +116,7 @@ void cleanup(){
     munmap((to_collect), sizeof((to_collect)));//UNMAP(to_collect)
     munmap((left_counter), sizeof((left_counter)));//UNMAP(left_counter)
     munmap((to_leave), sizeof((to_leave)));//UNMAP(to_leave)
+    munmap((forkfailed), sizeof((forkfailed)));
     munmap((filep), sizeof((filep)));
 
     sem_close(imm_enters);
@@ -133,20 +137,20 @@ void cleanup(){
 
 
 //IMM prints
-void print_imm_starts(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
-void print_imm_enters(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_checks(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_wants(int imm_id)    { fprintf(filep, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_got(int imm_id)      { fprintf(filep, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_leaves(int imm_id)   { fprintf(filep, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_starts(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
+void print_imm_enters(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_checks(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_wants(int imm_id)    { fprintf(stdout, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_got(int imm_id)      { fprintf(stdout, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_leaves(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
 //JUDGE prints
-void print_judge_wants()    { fprintf(filep, "%i\t: JUDGE\t\t: wants to enter\t: %i\t: %i\t: %i\n",      ++*action_counter, *NE, *NC, *NB); }
-void print_judge_enters()   { fprintf(filep, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_waits()    { fprintf(filep, "%i\t: JUDGE\t\t: waits fo imm\t: %i\t: %i\t: %i\n",        ++*action_counter, *NE, *NC, *NB); }
-void print_judge_starts()   { fprintf(filep, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
-void print_judge_ends()     { fprintf(filep, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
-void print_judge_leaves()   { fprintf(filep, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_finishes() { fprintf(filep, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
+void print_judge_wants()    { fprintf(stdout, "%i\t: JUDGE\t\t: wants to enter\t: %i\t: %i\t: %i\n",      ++*action_counter, *NE, *NC, *NB); }
+void print_judge_enters()   { fprintf(stdout, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
+void print_judge_waits()    { fprintf(stdout, "%i\t: JUDGE\t\t: waits for imm\t\t: %i\t: %i\t: %i\n",        ++*action_counter, *NE, *NC, *NB); }
+void print_judge_starts()   { fprintf(stdout, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
+void print_judge_ends()     { fprintf(stdout, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
+void print_judge_leaves()   { fprintf(stdout, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
+void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
 
 
 void IMM_generator(){
@@ -154,27 +158,27 @@ void IMM_generator(){
     for (int i = 0; i < *PI; i++){
 
         pid_t IMM = fork();
-        if (IMM < 0) {fprintf(stderr, "Immigrant process fork error\n"); sem_post(alldone); exit(1);}
+        if (IMM < 0) {fprintf(stderr, "Immigrant process fork error\n"); *forkfailed = true; sem_post(alldone); exit(1);}
         if (IMM == 0){
             //immmigrant
             int id = ++*IMM_counter;
 
             //starts
-            print_imm_starts(id);
+            print_imm_starts(id);//printf("I1\n");
 
             //enters
-            sem_wait(imm_enters);
-            ++*NE;
-            ++*NB;
-            print_imm_enters(id);
-            sem_post(imm_enters);
+            sem_wait(imm_enters);//printf("I2\n");
+            ++*NE;//printf("I3\n");
+            ++*NB;//printf("I4\n");
+            print_imm_enters(id);//printf("I5\n");
+            sem_post(imm_enters);//printf("I6\n");
 
             //checks
-            sem_wait(imm_checks);
-            ++*NC;
+            sem_wait(imm_checks);//printf("I7\n");
+            ++*NC;//printf("I8\n");
             print_imm_checks(id);
-            if (*judge_inside == true && *NE == *NC) sem_post(judge_waits);
-            sem_post(imm_checks);
+            //if (*judge_inside == true && *NE == *NC) {sem_post(judge_waits);printf("I9\n");}
+            sem_post(imm_checks);//printf("I10\n");
 
             //wants & got
             sem_wait(decided);
@@ -252,27 +256,30 @@ int main(int argc, char *argv[]){
     FILE *filep = fopen("proj2.out", "w");
 
     pid_t proc_JUDGE = fork();
-    if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE process fork error\n"); sem_post(alldone); return 1;}
+    if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE process fork error\n"); *forkfailed = true; sem_post(alldone); return 1;}
     if(proc_JUDGE == 0){
 
-        while(*solved_counter != *PI){
+        while(*solved_counter != *PI && forkfailed == false){
 
             //wants & enters
             sleepEM(*JG);
             print_judge_wants();
-            sem_wait(imm_enters);//closes entrance
-            sem_wait(judge_in);//closes exit
-            *judge_inside = true;
-            print_judge_enters();
+            sem_wait(imm_checks);//printf("J5\n");
+            sem_wait(imm_enters);//printf("J1\n");//closes entrance
+            sem_wait(judge_in);//printf("J2\n");//closes exit
+            *judge_inside = true;//printf("J3\n");
+            print_judge_enters();//printf("J4\n");
 
             //waits
-            sem_wait(imm_checks);
-            if (*NE != *NC){
-                print_judge_waits();
-                sem_post(imm_checks);
-                sem_wait(judge_waits);
-            }
-            sem_post(imm_checks);
+            //sem_wait(imm_checks);printf("J5\n");
+            //sem_wait(imm_checks);
+            if (*NE != *NC){//printf("J6\n");
+                print_judge_waits();//printf("J7\n");
+                //sem_post(imm_checks);printf("J8\n");
+                //sem_wait(judge_waits);printf("J9\n");
+            }//printf("J10\n");
+            sem_post(imm_checks);//printf("J11\n");
+            while(*NE != *NC){}
 
             //confirms
             print_judge_starts();
@@ -299,7 +306,7 @@ int main(int argc, char *argv[]){
         exit(0);
     }
     pid_t proc_IMM_gen = fork();
-    if(proc_IMM_gen < 0) {fprintf(stderr, "Immigrant generator process fork error\n"); sem_post(alldone); return 1;}
+    if(proc_IMM_gen < 0) {fprintf(stderr, "Immigrant generator process fork error\n"); *forkfailed = true; sem_post(alldone); return 1;}
     if(proc_IMM_gen == 0){
         IMM_generator();
         if (++*proc_done == *PI) sem_post(alldone);
