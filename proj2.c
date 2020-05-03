@@ -138,19 +138,19 @@ void cleanup(){
 
 //IMM prints
 void print_imm_starts(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: starts\n",                                 ++*action_counter, imm_id); }
-void print_imm_enters(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_checks(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_enters(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: enters\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, ++*NE, *NC, ++*NB); }
+void print_imm_checks(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: checks\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, ++*NC, *NB); }
 void print_imm_wants(int imm_id)    { fprintf(stdout, "%i\t: IMM %i\t\t: wants certificate\t: %i\t: %i\t: %i\n",    ++*action_counter, imm_id, *NE, *NC, *NB); }
 void print_imm_got(int imm_id)      { fprintf(stdout, "%i\t: IMM %i\t\t: got certificate\t: %i\t: %i\t: %i\n",      ++*action_counter, imm_id, *NE, *NC, *NB); }
-void print_imm_leaves(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, *NB); }
+void print_imm_leaves(int imm_id)   { fprintf(stdout, "%i\t: IMM %i\t\t: leaves\t\t: %i\t: %i\t: %i\n",             ++*action_counter, imm_id, *NE, *NC, --*NB); }
 //JUDGE prints
 void print_judge_wants()    { fprintf(stdout, "%i\t: JUDGE\t\t: wants to enter\t: %i\t: %i\t: %i\n",      ++*action_counter, *NE, *NC, *NB); }
 void print_judge_enters()   { fprintf(stdout, "%i\t: JUDGE\t\t: enters\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_waits()    { fprintf(stdout, "%i\t: JUDGE\t\t: waits for imm\t\t: %i\t: %i\t: %i\n",        ++*action_counter, *NE, *NC, *NB); }
+void print_judge_waits()    { fprintf(stdout, "%i\t: JUDGE\t\t: waits for imm\t\t: %i\t: %i\t: %i\n",     ++*action_counter, *NE, *NC, *NB); }
 void print_judge_starts()   { fprintf(stdout, "%i\t: JUDGE\t\t: starts confirmation\t: %i\t: %i\t: %i\n", ++*action_counter, *NE, *NC, *NB); }
 void print_judge_ends()     { fprintf(stdout, "%i\t: JUDGE\t\t: ends confirmation\t: %i\t: %i\t: %i\n",   ++*action_counter, *NE, *NC, *NB); }
 void print_judge_leaves()   { fprintf(stdout, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); }
-void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",                                ++*action_counter); }
+void print_judge_finishes() { fprintf(stdout, "%i\t: JUDGE\t\t: finishes\n",                              ++*action_counter); }
 
 
 void IMM_generator(){
@@ -168,14 +168,14 @@ void IMM_generator(){
 
             //enters
             sem_wait(imm_enters);//printf("I2\n");
-            ++*NE;//printf("I3\n");
-            ++*NB;//printf("I4\n");
+            //++*NE;//printf("I3\n");
+            //++*NB;//printf("I4\n");
             print_imm_enters(id);//printf("I5\n");
             sem_post(imm_enters);//printf("I6\n");
 
             //checks
             sem_wait(imm_checks);//printf("I7\n");
-            ++*NC;//printf("I8\n");
+            //++*NC;//printf("I8\n");
             print_imm_checks(id);
             //if (*judge_inside == true && *NE == *NC) {sem_post(judge_waits);printf("I9\n");}
             sem_post(imm_checks);//printf("I10\n");
@@ -196,7 +196,7 @@ void IMM_generator(){
 
             //leaves
             sem_wait(judge_in);
-            --*NB;
+            //--*NB;
             print_imm_leaves(id);
             ++*left_counter;
 /*            if (*left_counter != *to_leave){
@@ -280,6 +280,7 @@ int main(int argc, char *argv[]){
             }//printf("J10\n");
             sem_post(imm_checks);//printf("J11\n");
             while(*NE != *NC){}
+            sem_wait(imm_checks);
 
             //confirms
             print_judge_starts();
@@ -297,6 +298,7 @@ int main(int argc, char *argv[]){
             print_judge_leaves();
             *judge_inside = false;
             //if (*to_leave != 0) sem_post(judge_in);//opens exit
+            sem_post(imm_checks);
             sem_post(imm_enters);//opens entrance
             sem_post(judge_in);
         }
