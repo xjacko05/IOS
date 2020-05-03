@@ -35,6 +35,7 @@ int *collected_counter = NULL;
 int *to_collect = NULL;
 int *left_counter = NULL;
 int *to_leave = NULL;
+FILE *filep = NULL;
 
 sem_t *imm_enters = NULL;
 sem_t *imm_checks = NULL;
@@ -76,10 +77,13 @@ int variable_map(){
     *left_counter = 0;
     to_leave = mmap(NULL, sizeof(*(to_leave)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_leave)
     *to_leave = 0;
+    filep = mmap(NULL, sizeof(*(filep)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(filep)
+    filep = fopen("proj2.out", "w");//open("proj2.out", O_WRONLY | O_APPEND | O_CREAT, 0644);
+    setbuf(filep, NULL);
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((imm_checks = sem_open("/xjacko05.2020.imm_checks", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
-    if ((judge_in = sem_open("/xjacko05.2020.judge_in", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
+    if ((judge_in = sem_open("/xjacko05.2020.judge_in", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
     if ((judge_waits = sem_open("/xjacko05.2020.judge_waits", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((decided = sem_open("/xjacko05.2020.decided", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
     if ((alldone = sem_open("/xjacko05.2020.alldone", O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) return 1;
@@ -109,6 +113,7 @@ void cleanup(){
     munmap((to_collect), sizeof((to_collect)));//UNMAP(to_collect)
     munmap((left_counter), sizeof((left_counter)));//UNMAP(left_counter)
     munmap((to_leave), sizeof((to_leave)));//UNMAP(to_leave)
+    munmap((filep), sizeof((filep)));
 
     sem_close(imm_enters);
     sem_close(imm_checks);
@@ -149,7 +154,7 @@ void IMM_generator(){
     for (int i = 0; i < *PI; i++){
 
         pid_t IMM = fork();
-        if (IMM < 0) {fprintf(stderr, "IMMIGRANT_RIP\n"); exit(1);}
+        if (IMM < 0) {fprintf(stderr, "Immigrant process fork error\n"); sem_post(alldone); exit(1);}
         if (IMM == 0){
             //immmigrant
             int id = ++*IMM_counter;
@@ -178,11 +183,11 @@ void IMM_generator(){
             if (*collected_counter != *to_collect){
                 sem_post(decided);
             }
-            else{
+ /*           else{
                 *collected_counter = 0;
                 *to_collect = 0;
             }
-            sleepEM(*IT);
+ */         sleepEM(*IT);
             print_imm_got(id);
 
             //leaves
@@ -190,13 +195,14 @@ void IMM_generator(){
             --*NB;
             print_imm_leaves(id);
             ++*left_counter;
-            if (*left_counter != *to_leave){
+/*            if (*left_counter != *to_leave){
                 sem_post(judge_in);
             }
             else{
                 *left_counter = 0;
                 *to_leave = 0;
             }
+*/          sem_post(judge_in);
 
             //IMM termination
             if (++*proc_done == *PI) sem_post(alldone);
@@ -243,17 +249,19 @@ int main(int argc, char *argv[]){
     if (*JT < 0 || *JT > 2000) return 1;
 
     ///ACTUAL CODE
+    FILE *filep = fopen("proj2.out", "w");
+
     pid_t proc_JUDGE = fork();
-    if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE_RIP\n"); return 1;}
+    if(proc_JUDGE < 0) {fprintf(stderr, "JUDGE process fork error\n"); sem_post(alldone); return 1;}
     if(proc_JUDGE == 0){
 
-        //printf("JUDGE\n");
         while(*solved_counter != *PI){
 
-            //wants &enters
+            //wants & enters
             sleepEM(*JG);
             print_judge_wants();
-            sem_wait(imm_enters);
+            sem_wait(imm_enters);//closes entrance
+            sem_wait(judge_in);//closes exit
             *judge_inside = true;
             print_judge_enters();
 
@@ -270,8 +278,8 @@ int main(int argc, char *argv[]){
             print_judge_starts();
             sleepEM(*JT);
             *solved_counter += *NC;
-            *to_collect = *NC;
-            *to_leave = *NC;
+            *to_collect += *NC;
+            //*to_leave = *NC;
             *NE = 0;
             *NC = 0;
             print_judge_ends();
@@ -281,8 +289,9 @@ int main(int argc, char *argv[]){
             sleepEM(*JT);
             print_judge_leaves();
             *judge_inside = false;
-            if (*to_leave != 0) sem_post(judge_in);
-            sem_post(imm_enters);
+            //if (*to_leave != 0) sem_post(judge_in);//opens exit
+            sem_post(imm_enters);//opens entrance
+            sem_post(judge_in);
         }
 
         print_judge_finishes();
@@ -290,7 +299,7 @@ int main(int argc, char *argv[]){
         exit(0);
     }
     pid_t proc_IMM_gen = fork();
-    if(proc_IMM_gen < 0) {fprintf(stderr, "IMM_GEN_RIP\n"); return 1;}
+    if(proc_IMM_gen < 0) {fprintf(stderr, "Immigrant generator process fork error\n"); sem_post(alldone); return 1;}
     if(proc_IMM_gen == 0){
         IMM_generator();
         if (++*proc_done == *PI) sem_post(alldone);
@@ -298,6 +307,7 @@ int main(int argc, char *argv[]){
     }
     
     sem_wait(alldone);
+    fclose(filep);
     cleanup();
 
     return 0;
