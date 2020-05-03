@@ -12,8 +12,6 @@
 
 
 #define sleepEM(time){ if (time != 0) usleep((rand() % time) * 1000);}
-//#define MMAP(ptr) {(ptr) = mmap(NULL, sizeof(*(ptr)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);}
-//#define UNMAP(ptr) {munmap((ptr), sizeof((ptr)));}
 
 
 int *PI = NULL;
@@ -48,41 +46,41 @@ sem_t *outsync = NULL;
 
 int variable_map(){
 
-    PI = mmap(NULL, sizeof(*(PI)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(PI)
-    IG = mmap(NULL, sizeof(*(IG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IG)
-    JG = mmap(NULL, sizeof(*(JG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(JG)
-    IT = mmap(NULL, sizeof(*(IT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IT)
-    JT = mmap(NULL, sizeof(*(JT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(JT)
+    PI = mmap(NULL, sizeof(*(PI)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    IG = mmap(NULL, sizeof(*(IG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    JG = mmap(NULL, sizeof(*(JG)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    IT = mmap(NULL, sizeof(*(IT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    JT = mmap(NULL, sizeof(*(JT)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-    NE = mmap(NULL, sizeof(*(NE)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NE)
+    NE = mmap(NULL, sizeof(*(NE)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *NE = 0;
-    NC = mmap(NULL, sizeof(*(NC)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NC)
+    NC = mmap(NULL, sizeof(*(NC)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *NC = 0;
-    NB = mmap(NULL, sizeof(*(NB)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(NB)
+    NB = mmap(NULL, sizeof(*(NB)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *NB = 0;
 
-     action_counter= mmap(NULL, sizeof(*(action_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(action_counter)
+     action_counter= mmap(NULL, sizeof(*(action_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *action_counter = 0;
-    IMM_counter = mmap(NULL, sizeof(*(IMM_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(IMM_counter)
+    IMM_counter = mmap(NULL, sizeof(*(IMM_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *IMM_counter = 0;
-    proc_done = mmap(NULL, sizeof(*(proc_done)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(proc_done)
+    proc_done = mmap(NULL, sizeof(*(proc_done)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *proc_done = -2;
-    judge_inside = mmap(NULL, sizeof(*(judge_inside)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(judge_inside)
+    judge_inside = mmap(NULL, sizeof(*(judge_inside)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *judge_inside = false;
-    solved_counter = mmap(NULL, sizeof(*(solved_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(solved_counter)
+    solved_counter = mmap(NULL, sizeof(*(solved_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *solved_counter = 0;
-    collected_counter = mmap(NULL, sizeof(*(collected_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(collected_counter)
+    collected_counter = mmap(NULL, sizeof(*(collected_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *collected_counter = 0;
-    to_collect = mmap(NULL, sizeof(*(to_collect)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_collect)
+    to_collect = mmap(NULL, sizeof(*(to_collect)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *to_collect = 0;
-    left_counter = mmap(NULL, sizeof(*(left_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(left_counter)
+    left_counter = mmap(NULL, sizeof(*(left_counter)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *left_counter = 0;
-    to_leave = mmap(NULL, sizeof(*(to_leave)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(to_leave)
+    to_leave = mmap(NULL, sizeof(*(to_leave)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *to_leave = 0;
     forkfailed = mmap(NULL, sizeof(*(forkfailed)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *forkfailed = false;
-    filep = mmap(NULL, sizeof(*(filep)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//MMAP(filep)
-    filep = fopen("proj2.out", "w");//open("proj2.out", O_WRONLY | O_APPEND | O_CREAT, 0644);
+    filep = mmap(NULL, sizeof(*(filep)), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    filep = fopen("proj2.out", "w");
     setbuf(filep, NULL);
 
     if ((imm_enters = sem_open("/xjacko05.2020.imm_enters", O_CREAT | O_EXCL, 0666, 1)) == SEM_FAILED) return 1;
@@ -99,26 +97,25 @@ int variable_map(){
 
 void cleanup(){
 
-    fclose(filep);
-    munmap((PI), sizeof((PI)));//UNMAP(PI)
-    munmap((IG), sizeof((IG)));//UNMAP(IG)
-    munmap((JG), sizeof((JG)));//UNMAP(JG)
-    munmap((IT), sizeof((IT)));//UNMAP(IT)
-    munmap((JT), sizeof((JT)));//UNMAP(JT)
+    munmap((PI), sizeof((PI)));
+    munmap((IG), sizeof((IG)));
+    munmap((JG), sizeof((JG)));
+    munmap((IT), sizeof((IT)));
+    munmap((JT), sizeof((JT)));
 
-    munmap((NE), sizeof((NE)));//UNMAP(NE)
-    munmap((NC), sizeof((NC)));//UNMAP(NC)
-    munmap((NB), sizeof((NB)));//UNMAP(NB)
+    munmap((NE), sizeof((NE)));
+    munmap((NC), sizeof((NC)));
+    munmap((NB), sizeof((NB)));
 
-    munmap((action_counter), sizeof((action_counter)));//UNMAP(action_counter)
-    munmap((IMM_counter), sizeof((IMM_counter)));//UNMAP(IMM_counter)
-    munmap((proc_done), sizeof((proc_done)));//UNMAP(proc_done)
-    munmap((judge_inside), sizeof((judge_inside)));//UNMAP(judge_inside)
-    munmap((solved_counter), sizeof((solved_counter)));//UNMAP(solved_counter)
-    munmap((collected_counter), sizeof((collected_counter)));//UNMAP(collected_counter)
-    munmap((to_collect), sizeof((to_collect)));//UNMAP(to_collect)
-    munmap((left_counter), sizeof((left_counter)));//UNMAP(left_counter)
-    munmap((to_leave), sizeof((to_leave)));//UNMAP(to_leave)
+    munmap((action_counter), sizeof((action_counter)));
+    munmap((IMM_counter), sizeof((IMM_counter)));
+    munmap((proc_done), sizeof((proc_done)));
+    munmap((judge_inside), sizeof((judge_inside)));
+    munmap((solved_counter), sizeof((solved_counter)));
+    munmap((collected_counter), sizeof((collected_counter)));
+    munmap((to_collect), sizeof((to_collect)));
+    munmap((left_counter), sizeof((left_counter)));
+    munmap((to_leave), sizeof((to_leave)));
     munmap((forkfailed), sizeof((forkfailed)));
     munmap((filep), sizeof((filep)));
 
@@ -172,18 +169,14 @@ void IMM_generator(){
             print_imm_starts(id);
 
             //enters
-            sem_wait(imm_enters);//printf("I2\n");
-            //++*NE;//printf("I3\n");
-            //++*NB;//printf("I4\n");
-            print_imm_enters(id);//printf("I5\n");
-            sem_post(imm_enters);//printf("I6\n");
+            sem_wait(imm_enters);
+            print_imm_enters(id);
+            sem_post(imm_enters);
 
             //checks
-            sem_wait(imm_checks);//printf("I7\n");
-            //++*NC;//printf("I8\n");
+            sem_wait(imm_checks);
             print_imm_checks(id);
-            //if (*judge_inside == true && *NE == *NC) {sem_post(judge_waits);printf("I9\n");}
-            sem_post(imm_checks);//printf("I10\n");
+            sem_post(imm_checks);
 
             //wants & got
             sem_wait(decided);
@@ -192,26 +185,14 @@ void IMM_generator(){
             if (*collected_counter != *to_collect){
                 sem_post(decided);
             }
- /*           else{
-                *collected_counter = 0;
-                *to_collect = 0;
-            }
- */         sleepEM(*IT);
+            sleepEM(*IT);
             print_imm_got(id);
 
             //leaves
             sem_wait(judge_in);
-            //--*NB;
             print_imm_leaves(id);
             ++*left_counter;
-/*            if (*left_counter != *to_leave){
-                sem_post(judge_in);
-            }
-            else{
-                *left_counter = 0;
-                *to_leave = 0;
-            }
-*/          sem_post(judge_in);
+            sem_post(judge_in);
 
             //IMM termination
             if (++*proc_done == *PI) sem_post(alldone);
@@ -224,7 +205,7 @@ void IMM_generator(){
 
 int main(int argc, char *argv[]){
 
-    //KOLOTOCARINA AF opravit TODO
+    //case of interruped previous run
     cleanup();
 
 	//argument count check
@@ -277,21 +258,15 @@ int main(int argc, char *argv[]){
             //wants & enters
             sleepEM(*JG);
             print_judge_wants();
-            sem_wait(imm_checks);//printf("J5\n");
-            sem_wait(imm_enters);//printf("J1\n");//closes entrance
-            sem_wait(judge_in);//printf("J2\n");//closes exit
-            *judge_inside = true;//printf("J3\n");
-            print_judge_enters();//printf("J4\n");
+            sem_wait(imm_checks);
+            sem_wait(imm_enters);
+            sem_wait(judge_in);
+            *judge_inside = true;
+            print_judge_enters();
 
             //waits
-            //sem_wait(imm_checks);printf("J5\n");
-            //sem_wait(imm_checks);
-            if (*NE != *NC){//printf("J6\n");
-                print_judge_waits();//printf("J7\n");
-                //sem_post(imm_checks);printf("J8\n");
-                //sem_wait(judge_waits);printf("J9\n");
-            }//printf("J10\n");
-            sem_post(imm_checks);//printf("J11\n");
+            if (*NE != *NC) print_judge_waits();
+            sem_post(imm_checks);
             while(*NE != *NC){}
             sem_wait(imm_checks);
 
@@ -300,7 +275,6 @@ int main(int argc, char *argv[]){
             sleepEM(*JT);
             *solved_counter += *NC;
             *to_collect += *NC;
-            //*to_leave = *NC;
             *NE = 0;
             *NC = 0;
             print_judge_ends();
@@ -310,7 +284,6 @@ int main(int argc, char *argv[]){
             sleepEM(*JT);
             print_judge_leaves();
             *judge_inside = false;
-            //if (*to_leave != 0) sem_post(judge_in);//opens exit
             sem_post(imm_checks);
             sem_post(imm_enters);//opens entrance
             sem_post(judge_in);
@@ -321,9 +294,9 @@ int main(int argc, char *argv[]){
         exit(0);
     }
 
-    
     sem_wait(alldone);
     cleanup();
+    fclose(filep);
 
     return 0;
 }
