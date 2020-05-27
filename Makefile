@@ -1,4 +1,7 @@
-all: proj2.c
-	@gcc -std=gnu99 -Wall -Wextra -Werror -pedantic -o proj2 proj2.c -lpthread -lrt
-clean: proj2
-	@rm proj2
+SOURCE = proj2
+CC = gcc
+CFLAGS = -std=gnu99 -Wall -Wextra -Werror -pedantic
+all: $(SOURCE).c
+	@$(CC) -std=gnu99 -Wall -Wextra -Werror -pedantic -o $(SOURCE) $(SOURCE).c -lpthread -lrt
+clean: $(SOURCE)
+	@rm $(SOURCE)

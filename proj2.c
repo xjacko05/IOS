@@ -143,8 +143,10 @@ void print_judge_ends()     { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t
 void print_judge_leaves()   { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: leaves\t\t: %i\t: %i\t: %i\n",            ++*action_counter, *NE, *NC, *NB); sem_post(outsync); }
 void print_judge_finishes() { sem_wait(outsync); fprintf(filep, "%i\t: JUDGE\t\t: finishes\n",                              ++*action_counter); sem_post(outsync); }
 
+//err prints
+void print_inv_args() {fprintf(stderr, "Invalind arguments\n"); exit(1);}
 
-//
+//immigrant generatoe process
 void IMM_generator(){
 
     for (int i = 0; i < *PI; i++){
@@ -198,34 +200,34 @@ int main(int argc, char *argv[]){
     cleanup();
 
 	//argument count check
-    if (argc != 6){fprintf(stderr, "Invalind arguments\n"); return 1;}
+    if (argc != 6)print_inv_args();
 
     //semaphore & variable init check
     if (variable_map() == 1) cleanup();
 
 	//PI check
     *PI = atoi(argv[1]);
-    if (*PI < 1){fprintf(stderr, "Invalind arguments\n"); return 1;}
+    if (*PI < 1)print_inv_args();
 
 	//IG check
     *IG = atoi(argv[2]);
-    if (*IG == 0 && strcmp(argv[2], "0") != 0){fprintf(stderr, "Invalind arguments\n"); return 1;}
-    if (*IG < 0 || *IG > 2000){fprintf(stderr, "Invalind arguments\n"); return 1;}
+    if (*IG == 0 && strcmp(argv[2], "0") != 0)print_inv_args();
+    if (*IG < 0 || *IG > 2000)print_inv_args();
 
 	//JG check
     *JG = atoi(argv[3]);
-    if (*JG == 0 && strcmp(argv[3], "0") != 0){fprintf(stderr, "Invalind arguments\n"); return 1;}
-    if (*JG < 0 || *JG > 2000){fprintf(stderr, "Invalind arguments\n"); return 1;}
+    if (*JG == 0 && strcmp(argv[3], "0") != 0)print_inv_args();
+    if (*JG < 0 || *JG > 2000)print_inv_args();
 
 	//IT check
     *IT = atoi(argv[4]);
-    if (*IT == 0 && strcmp(argv[4], "0") != 0){fprintf(stderr, "Invalind arguments\n"); return 1;}
-    if (*IT < 0 || *IT > 2000){fprintf(stderr, "Invalind arguments\n"); return 1;}
+    if (*IT == 0 && strcmp(argv[4], "0") != 0)print_inv_args();
+    if (*IT < 0 || *IT > 2000)print_inv_args();
 
 	//JT chcek
     *JT = atoi(argv[5]);
-    if (*JT == 0 && strcmp(argv[5], "0") != 0){fprintf(stderr, "Invalind arguments\n"); return 1;}
-    if (*JT < 0 || *JT > 2000) return 1;
+    if (*JT == 0 && strcmp(argv[5], "0") != 0)print_inv_args();
+    if (*JT < 0 || *JT > 2000) print_inv_args();
 
     //file opening
     FILE *filep = fopen("proj2.out", "w");
